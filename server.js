@@ -3,7 +3,7 @@ const http = require('node:http');
 const crypto = require('node:crypto');
 const escape = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const key = process.env.ACCESS_KEY;
-if (!key || key.length < 16) throw new Error('Set ACCESS_KEY to at least 16 characters.');
+if (!key || key.length < 8) throw new Error('Set ACCESS_KEY to at least 8 characters.');
 const session = crypto.randomBytes(32).toString('hex');
 let browser, page, shot, queue = Promise.resolve();
 async function ready() {
