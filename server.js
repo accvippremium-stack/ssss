@@ -23,10 +23,11 @@ async function ready() {
   browser.on('disconnected', () => {page = null; browser = null; shot = null;});
 }
 function html(message='') {
-  return '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=360"><title>E7 Web</title></head><body style="margin:0;font-family:Arial;background:#eee">'+
+  const shortcuts = [['Facebook','https://m.facebook.com'],['Zalo','https://chat.zalo.me'],['YouTube','https://m.youtube.com']].map(([label,url])=>'<form style="display:inline" method="post" action="/action"><input type="hidden" name="url" value="'+url+'"><button name="op" value="go">'+label+'</button></form>').join(' ');
+  return '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=360"><title>E7 Web</title><style>body{width:360px}button{min-height:36px;font-size:16px}input[type=text],input:not([type]){font-size:16px;max-width:260px}h3{margin:6px 0}p{font-size:13px}</style></head><body style="margin:0;font-family:Arial;background:#eee">'+shortcuts+
   '<h3>E7 Web</h3><p>'+escape(message)+'</p><form method="post" action="/action"><input name="url" size="28" placeholder="https://example.com"><button name="op" value="go">Mo</button><br><button name="op" value="back">Lui</button> <button name="op" value="up">Len</button> <button name="op" value="down">Xuong</button> <button name="op" value="refresh">Cap nhat</button></form>'+
   (shot ? '<form method="post" action="/action"><input type="hidden" name="op" value="click"><input type="image" name="point" src="/screen?t='+Date.now()+'" width="360" height="480" alt="Trang web"></form>' : '<p>Nhap dia chi de bat dau.</p>')+
-  '<form method="post" action="/action"><input name="text" size="26"><button name="op" value="type">Nhap chu</button><button name="op" value="enter">Enter</button></form><p>Bam o nhap trong anh truoc khi nhap chu. Video va am thanh chua duoc ho tro.</p><form method="post" action="/action"><button name="op" value="reset">Xoa phien</button></form></body></html>';
+  '<form method="post" action="/action"><input name="text" size="22"><button name="op" value="type">Nhap chu</button><button name="op" value="submit">Nhap + gui</button><button name="op" value="enter">Enter</button></form><p>Bam o nhap trong anh truoc khi nhap chu. YouTube: chi xem trang, chua phat video/am thanh. Facebook/Zalo: can dang nhap; chua xac nhan nhan tin.</p><form method="post" action="/action"><button name="op" value="reset">Xoa phien</button></form></body></html>';
 }
 async function body(req) {
   const chunks=[]; let size=0;
@@ -69,6 +70,7 @@ async function handle(req,res) {
           await page.mouse.click(x,y); break;
         }
         case 'type': await page.keyboard.insertText((p.get('text')||'').slice(0,2000)); break;
+        case 'submit': await page.keyboard.insertText((p.get('text')||'').slice(0,2000)); await page.keyboard.press('Enter'); break;
         case 'enter': await page.keyboard.press('Enter'); break;
         case 'reset': await browser.close(); return;
         default: throw new Error('Thao tac khong hop le');
